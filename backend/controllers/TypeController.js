@@ -10,9 +10,9 @@ class TypeController {
     }
 
     async getAll(request, response) {
-        const type = await Type.findAll()
+        const types = await Type.findAll()
 
-        return response.json(type)
+        return response.json(types)
     }
 }
 
