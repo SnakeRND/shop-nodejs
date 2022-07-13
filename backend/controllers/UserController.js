@@ -52,12 +52,10 @@ class UserController {
         return response.json({token})
     }
 
-    async auth(request, response, next) {
-        const {id} = request.query
-        if (!id) {
-            return next(ApiError.badRequest('ID is missing'))
-        }
-        response.json(id)
+    async check(request, response, next) {
+        const token = generateJwt(request.user.id, request.user.email, request.user.role)
+
+        return response.json({token})
     }
 }
 
