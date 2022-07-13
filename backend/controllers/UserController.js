@@ -1,4 +1,5 @@
 const ApiError = require('../errors/apiError')
+
 class UserController {
     async register(request, response) {
 
