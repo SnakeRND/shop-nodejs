@@ -1,8 +1,40 @@
 const ApiError = require('../errors/apiError')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+const {User, Basket} = require('../models/models')
+
+const generateJwt = (id, email, role) => {
+    return jwt.sign(
+        {
+            id,
+            email,
+            role
+        },
+        process.env.SECRET_KEY,
+        {
+            expiresIn: process.env.TOKEN_LIFETIME
+        }
+    )
+}
 
 class UserController {
-    async register(request, response) {
+    async register(request, response, next) {
+        const {email, password, role} = request.body
+        if (!email || !password) {
+            return next(ApiError.badRequest('Wrong email or password'))
+        }
 
+        const emailExist = await User.findOne({where: {email}})
+        if (emailExist) {
+            return next(ApiError.badRequest('Email already exist'))
+        }
+
+        const hashPassword = await bcrypt.hash(password, 5)
+        const user = await User.create({email, role, password: hashPassword})
+        const basket = await Basket.create({userId: user.id})
+        const token = generateJwt()
+
+        return response.json(token)
     }
 
     async login(request, response) {
